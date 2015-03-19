@@ -1,7 +1,7 @@
 keyployer
 
 Usage:
-  keyployer (--fqdn <fqdn>) (--signed <signed>) (--truststore <truststore>) (--hosts-truststore <hosts-truststore>) (--cmhost=<cmhost>) (--hue-host=<huehost>)
+  keyployer (--fqdn <fqdn>) (--signed <signed>) (--truststore <truststore>) (--cmhost=<cmhost>) (--hue-host=<huehost>)
 
 Options:
   -h --help                Show this screen.
@@ -10,7 +10,6 @@ Options:
   --cmhost=<cmhost>        CM Host FQDN
   --signed=<sk>            (Self-) Signed Keystore.
   --truststore=<ts>        Truststore
-  --hosts-truststore=<hts> Hosts Truststore
   --hue-host=<hue-host>    Include hue?
 
 

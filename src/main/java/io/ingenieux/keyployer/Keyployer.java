@@ -37,6 +37,7 @@ public class Keyployer
     public static final char[] DEFAULT_PASSWORD_ARR = DEFAULT_PASSWORD.toCharArray();
 
     public static final KeyStore.ProtectionParameter DEFAULT_PASSWORD_PROTECTION = new KeyStore.PasswordProtection(DEFAULT_PASSWORD_ARR);
+
     public static final String CMAGENT_PREFIX = "opt/cloudera/security/cmagent/";
 
     private final KeyployerOptions keyployerOpts;
@@ -44,7 +45,8 @@ public class Keyployer
     private final JKSRepo signedKeystore;
 
     private final JKSRepo truststore;
-    private String password;
+
+    private final String password = PasswordGenerator.generateRandomPassword();
 
     //private final JKSRepo truststore;
 
@@ -87,7 +89,7 @@ public class Keyployer
 
         // TODO: Allow custom key instead
         if (isCMHost()) {
-            exportCMHost(DEFAULT_PASSWORD);
+            exportCMHost(password);
         }
 
         exportTrustStore(DEFAULT_PASSWORD);
@@ -115,7 +117,6 @@ public class Keyployer
 
         IOUtils.write(cmHostEntry.asX509String(), outputStream);
 
-        password = PasswordGenerator.generateRandomPassword();
         char[] passwordArr = password.toCharArray();
         KeyStore.PasswordProtection passwordProtection = new KeyStore.PasswordProtection(passwordArr);
 

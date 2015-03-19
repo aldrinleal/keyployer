@@ -94,9 +94,6 @@ public class KeyployerOptions {
 
         if (null != args.get("--cmhost"))
             setCmHost((String) args.get("--cmhost"));
-
-        if (null != args.get("--hosts-truststore"))
-            setHostsTrustStore((String) args.get("--hosts-truststore"));
     }
 
     @Override
