@@ -88,7 +88,7 @@ public class JKSRepo {
             printWriter.print(base64.encodeAsString(cert.getEncoded()));
             printWriter.println(X509Factory.END_CERT);
 
-            return outputWriter.toString();
+            return outputWriter.toString().replaceAll("\\r", "");
         }
 
         public void writeAsP12(String name, OutputStream output, String password) throws Exception {

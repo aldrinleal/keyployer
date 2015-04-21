@@ -2,9 +2,18 @@
 
 set -xe
 
+SOURCE_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
 if [ "x" == "x$TARGET_DIR" ]; then
   TARGET_DIR=/opt/cloudera/security
 fi
 
 mkdir -p -m 755 $TARGET_DIR $TARGET_DIR/jks/ $TARGET_DIR/CAcerts $TARGET_DIR/cmagent $TARGET_DIR/x509 $TARGET_DIR/hue
+
+${body}
+
+test -f $SOURCE_DIR/cmagent/cmagent.key && install -m 400 -o cloudera-scm $SOURCE_DIR/cmagent/cmagent.key $TARGET_DIR/cmagent/cmagent.key
+test -f $SOURCE_DIR/cmagent/cmagent.pem && install -m 400 -o cloudera-scm $SOURCE_DIR/cmagent/cmagent.key $TARGET_DIR/cmagent/cmagent.pem
+test -f $SOURCE_DIR/hue/sslcert.key && install -m 400 -o cloudera-scm $SOURCE_DIR/hue/sslcert.key $TARGET_DIR/hue/sslcert.key
+test -f $SOURCE_DIR/hue/sslcert.pem && install -m 400 -o cloudera-scm $SOURCE_DIR/hue/sslcert.pem $TARGET_DIR/hue/sslcert.pem
 

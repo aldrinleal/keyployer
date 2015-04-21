@@ -75,9 +75,9 @@ public class XFileOutputStream extends FileOutputStream {
             boolean hasOwner = isNotBlank(owner);
             boolean hasMode = isNotBlank(mode);
 
-            List<String> cmd = new ArrayList<>(asList("/usr/bin/install"));
+            List<String> cmd = new ArrayList<>(asList("install"));
 
-            if (isNotBlank(owner) && "root".equals(System.getenv("USER"))) {
+            if (isNotBlank(owner)) {
                 cmd.addAll(asList("-o", owner));
             }
 
@@ -85,7 +85,7 @@ public class XFileOutputStream extends FileOutputStream {
                 cmd.addAll(asList("-m", mode));
             }
 
-            cmd.add(stripDeploymentDir(path));
+            cmd.add("$SOURCE_DIR/" + stripDeploymentDir(path));
 
             cmd.add(targetPath(path));
 

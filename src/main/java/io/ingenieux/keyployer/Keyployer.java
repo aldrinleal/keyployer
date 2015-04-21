@@ -3,6 +3,7 @@ package io.ingenieux.keyployer;
 import io.ingenieux.keyployer.util.PasswordGenerator;
 import io.ingenieux.keyployer.util.XFileOutputStream;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.text.StrSubstitutor;
 import org.docopt.Docopt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,10 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.security.KeyStore;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static io.ingenieux.keyployer.util.Exec.exec;
 import static java.lang.String.format;
@@ -130,8 +128,8 @@ public class Keyployer {
 
             keyEntry.writeAsP12("default", outputAsP12, password);
 
-            exec("/usr/bin/openssl", "pkcs12", "-in", cmAgentP12, "-passin", "pass:" + password, "-nokeys", "-out", CMAGENT_PREFIX + "cmagent.pem");
-            exec("/usr/bin/openssl", "pkcs12", "-in", cmAgentP12, "-passin", "pass:" + password, "-nocerts", "-passout", "pass:" + password, "-out", CMAGENT_PREFIX + "cmagent.key");
+            exec("/usr/bin/openssl", "pkcs12", "-in", cmAgentP12, "-passin", "pass:" + password, "-nokeys", "-out", CMAGENT_PREFIX + "cmagent.pem");// withPath / mode / owner
+            exec("/usr/bin/openssl", "pkcs12", "-in", cmAgentP12, "-passin", "pass:" + password, "-nocerts", "-passout", "pass:" + password, "-out", CMAGENT_PREFIX + "cmagent.key");// withPath / mode / owner
         }
     }
 
@@ -187,8 +185,8 @@ public class Keyployer {
         String cmAgentP12 = CMAGENT_PREFIX +
                 "cmagent.p12";
 
-        exec("/usr/bin/openssl", "pkcs12", "-in", cmAgentP12, "-passin", "pass:" + password, "-nokeys", "-out", DEPLOY_DIR + "/hue/sslcert.pem");
-        exec("/usr/bin/openssl", "pkcs12", "-in", cmAgentP12, "-passin", "pass:" + password, "-nocerts", "-nodes", "-passout", "pass:", "-out", DEPLOY_DIR + "/hue/sslcert.key");
+        exec("/usr/bin/openssl", "pkcs12", "-in", cmAgentP12, "-passin", "pass:" + password, "-nokeys", "-out", DEPLOY_DIR + "/hue/sslcert.pem"); // withPath / mode / owner
+        exec("/usr/bin/openssl", "pkcs12", "-in", cmAgentP12, "-passin", "pass:" + password, "-nocerts", "-nodes", "-passout", "pass:", "-out", DEPLOY_DIR + "/hue/sslcert.key"); // withPath / mode / owner
     }
 
     public void exportTrustStore(String truststorePassword) throws Exception {
@@ -299,11 +297,15 @@ public class Keyployer {
 
     private void writeInstallScript() throws Exception {
         try (FileOutputStream fos = new FileOutputStream(DEPLOY_DIR + "/install.sh")) {
-            String scriptContent = join(XFileOutputStream.dumpCommandList(), "\n") + "\n";
+            String bodyContent = join(XFileOutputStream.dumpCommandList(), "\n") + "\n";
 
-            scriptContent = SCRIPT_STUB + "\n\n" + scriptContent;
+            Map<String, String> varsMap = new HashMap<>();
 
-            IOUtils.write(scriptContent, fos);
+            varsMap.put("body", bodyContent);
+
+            String resultingContent = new StrSubstitutor(varsMap).replace(SCRIPT_STUB);
+
+            IOUtils.write(resultingContent, fos);
         }
     }
 }
