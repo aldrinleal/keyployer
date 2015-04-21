@@ -1,15 +1,14 @@
 keyployer
 
 Usage:
-  keyployer (--fqdn <fqdn>) (--signed <signed>) (--truststore <truststore>) (--cmhost=<cmhost>) (--hue-host=<huehost>)
+  keyployer (--fqdn <fqdn>) (--signed <signed>) (--truststore <truststore>) (--cmhost <cmhost>) (--hue-host <huehost>)
 
 Options:
   -h --help                Show this screen.
   --version                Show version.
-  --fqdn=<fqdn>            This hosts' fqdn.
-  --cmhost=<cmhost>        CM Host FQDN
-  --signed=<sk>            (Self-) Signed Keystore.
-  --truststore=<ts>        Truststore
-  --hue-host=<hue-host>    Include hue?
-
+  --fqdn <fqdn>            This hosts' fqdn.
+  --cmhost <cmhost>        CM Host FQDN
+  --signed <sk>            [Self-] Signed Keystore.
+  --truststore <ts>        Truststore
+  --hue-host <hue-host>    Include hue?
 

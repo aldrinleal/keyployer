@@ -1,68 +1,120 @@
 package io.ingenieux.keyployer.util;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-import static jdk.nashorn.internal.runtime.ScriptingFunctions.exec;
+import static java.util.Arrays.asList;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.join;
 
 public class XFileOutputStream extends FileOutputStream {
+    private static final List<String> commandList = new ArrayList<>();
+
+    public static List<String> dumpCommandList() {
+        return commandList;
+    }
+
+
     static final Logger LOGGER = LoggerFactory.getLogger(XFileOutputStream.class);
+
+    private static String DEPLOY_PREFIX = null;
+
+    public static void setDeployPrefix(String deployPrefix) {
+        DEPLOY_PREFIX = deployPrefix;
+    }
 
     private final String path;
 
-    private String owner;
-
-    private String mode;
-
-    public static XFileOutputStream get(String mask, Object... p) throws IOException {
+    public static XFileOutputStreamBuilder get(String mask, Object... p) throws IOException {
         final String path = String.format(mask, (Object[]) p);
 
         File f = new File(path).getParentFile();
 
-        if (! f.exists())
+        if (!f.exists())
             f.mkdirs();
 
         f.mkdir();
 
-        return new XFileOutputStream(path);
+        return new XFileOutputStreamBuilder(path);
     }
 
-    public XFileOutputStream(String path) throws FileNotFoundException {
-        super(path);
+    public static class XFileOutputStreamBuilder {
+        String path;
 
-        this.path = path;
-    }
+        String mode;
 
-    public XFileOutputStream withOwner(String owner) {
-        this.owner = owner;
+        String owner;
 
-        return this;
-    }
+        public XFileOutputStreamBuilder(String path) {
+            this.path = path;
+        }
 
-    public XFileOutputStream withMode(String mode) {
-        this.mode = mode;
 
-        return this;
-    }
+        public XFileOutputStreamBuilder withOwner(String owner) {
+            this.owner = owner;
 
-    @Override
-    public void close() throws IOException {
-        super.close();
+            return this;
+        }
 
-        try {
-            if (isNotBlank(owner)) {
-                exec("/bin/chown", owner, path);
+        public XFileOutputStreamBuilder withMode(String mode) {
+            this.mode = mode;
+
+            return this;
+        }
+
+        public XFileOutputStream build() throws IOException {
+            boolean hasOwner = isNotBlank(owner);
+            boolean hasMode = isNotBlank(mode);
+
+            List<String> cmd = new ArrayList<>(asList("/usr/bin/install"));
+
+            if (isNotBlank(owner) && "root".equals(System.getenv("USER"))) {
+                cmd.addAll(asList("-o", owner));
             }
 
             if (isNotBlank(mode)) {
-                exec("/bin/chmod", mode, path);
+                cmd.addAll(asList("-m", mode));
             }
-        } catch (Exception exc) {
-            throw new IOException(exc);
+
+            cmd.add(stripDeploymentDir(path));
+
+            cmd.add(targetPath(path));
+
+            String cmdAsStr = join(cmd, " ");
+
+            return new XFileOutputStream(path, cmdAsStr);
         }
+
+        private String targetPath(String path) {
+            return "$TARGET_DIR/" + FilenameUtils.getPath(stripDeploymentDir(path));
+        }
+
+        private String stripDeploymentDir(String path) {
+            if (isEmpty(DEPLOY_PREFIX))
+                return path;
+
+            if (path.startsWith(DEPLOY_PREFIX)) {
+                path = path.substring(1 + DEPLOY_PREFIX.length());
+            }
+
+            return path;
+        }
+    }
+
+    private XFileOutputStream(String path, String cmdAsStr) throws FileNotFoundException {
+        super(path);
+
+        this.path = path;
+
+        commandList.add(cmdAsStr);
     }
 }

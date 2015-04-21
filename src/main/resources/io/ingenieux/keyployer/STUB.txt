@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -xe
+
+if [ "x" == "x$TARGET_DIR" ]; then
+  TARGET_DIR=/opt/cloudera/security
+fi
+
+mkdir -p -m 755 $TARGET_DIR $TARGET_DIR/jks/ $TARGET_DIR/CAcerts $TARGET_DIR/cmagent $TARGET_DIR/x509 $TARGET_DIR/hue
+
