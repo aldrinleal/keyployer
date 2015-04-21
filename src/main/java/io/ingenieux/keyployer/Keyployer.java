@@ -117,16 +117,16 @@ public class Keyployer {
 
         hostKeyStore.getKs().setEntry("cmagent", entry, passwordProtection);
 
-        hostKeyStore.getKs().store(XFileOutputStream.get(DEPLOY_DIR + "/jks/cmagent-keystore.jks").withOwner("scm-agent").withMode("644").build(), passwordArr);
+        hostKeyStore.getKs().store(XFileOutputStream.get(DEPLOY_DIR + "/jks/cmagent-keystore.jks").withOwner("cloudera-scm").withMode("644").build(), passwordArr);
 
         IOUtils.write(password, XFileOutputStream.get(CMAGENT_PREFIX +
-                "cmagent.pw").withOwner("scm-agent").withMode("400").build());
+                "cmagent.pw").withOwner("cloudera-scm").withMode("400").build());
 
         {
             String cmAgentP12 = CMAGENT_PREFIX +
                     "cmagent.p12";
 
-            XFileOutputStream outputAsP12 = XFileOutputStream.get(cmAgentP12).withOwner("scm-agent").withMode("600").build();
+            XFileOutputStream outputAsP12 = XFileOutputStream.get(cmAgentP12).withOwner("cloudera-scm").withMode("600").build();
 
             keyEntry.writeAsP12("default", outputAsP12, password);
 
@@ -144,7 +144,7 @@ public class Keyployer {
 
         cmHostKeyStore.getKs().setEntry("cmhost", keyEntry.getEntry(), new KeyStore.PasswordProtection(passwordArr));
 
-        cmHostKeyStore.getKs().store(XFileOutputStream.get(DEPLOY_DIR + "/jks/cmhost-keystore.jks").withOwner("scm-agent").withMode("400").build(), passwordArr);
+        cmHostKeyStore.getKs().store(XFileOutputStream.get(DEPLOY_DIR + "/jks/cmhost-keystore.jks").withOwner("cloudera-scm").withMode("400").build(), passwordArr);
     }
 
     public void exportTrustStoreCertificates() throws Exception {
