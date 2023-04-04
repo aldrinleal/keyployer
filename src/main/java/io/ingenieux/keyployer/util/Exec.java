@@ -1,5 +1,6 @@
 package io.ingenieux.keyployer.util;
 
+import io.openpixee.security.SystemCommand;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +15,7 @@ public class Exec {
 
         LOGGER.info("Running: {}", argsAsString);
 
-        int rc = Runtime.getRuntime().exec(args).waitFor();
+        int rc = SystemCommand.runCommand(Runtime.getRuntime(), args).waitFor();
 
         if (0 != rc) {
             throw new RuntimeException("Unexpected result: " + rc + " for command: " + argsAsString);
