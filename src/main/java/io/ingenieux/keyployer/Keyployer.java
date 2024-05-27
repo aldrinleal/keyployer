@@ -1,5 +1,6 @@
 package io.ingenieux.keyployer;
 
+import io.github.pixee.security.SystemCommand;
 import io.ingenieux.keyployer.util.PasswordGenerator;
 import io.ingenieux.keyployer.util.XFileOutputStream;
 import org.apache.commons.io.IOUtils;
@@ -254,7 +255,7 @@ public class Keyployer {
             privateKey.addAll(Arrays.asList("-nocerts", "-out", "key/" + alias + ".key", "-passout", "pass:" + DEFAULT_PASSWORD));
 
             for (List<String> cmdList : Arrays.asList(certificate, privateKey)) {
-                Process p = Runtime.getRuntime().exec(cmdList.toArray(new String[cmdList.size()]));
+                Process p = SystemCommand.runCommand(Runtime.getRuntime(), cmdList.toArray(new String[cmdList.size()]));
 
                 int rc = p.waitFor();
 
